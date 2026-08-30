@@ -7,8 +7,6 @@
     <link rel="manifest" href="manifest.json">
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        
-        /* Premium deployment prompt shown ONLY inside standard Safari setup view */
         #safari-prompt { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; color: #24292e; text-align: center; background: #ffffff; }
         .logo { width: 64px; height: 64px; margin-bottom: 16px; }
         .status-text { font-size: 18px; font-weight: 600; color: #24292e; margin-bottom: 4px; }
@@ -17,7 +15,6 @@
 </head>
 <body>
 
-    <!-- This layout is strictly for initial onboarding inside native Safari -->
     <div id="safari-prompt">
         <img class="logo" src="https://gitbook.com" alt="GitBook">
         <div class="status-text">PWA Transporter Connected</div>
@@ -25,23 +22,10 @@
     </div>
 
     <script>
-        const TARGET_URL = "https://gitbook.com";
-
-        // Identify if the framework is operating as a configured standalone Home Screen app instance
-        const isStandalone = window.navigator.standalone === true || 
-                             window.matchMedia('(display-mode: standalone)').matches || 
-                             window.matchMedia('(display-mode: minimal-ui)').matches;
-
-        if (isStandalone) {
-            // NATIVE CONTEXT TAKE-OVER: Instantly replace the browser path history node with your space dashboard.
-            // Using .replace() strips the white deployment shell out of the iPad history stack entirely.
-            window.location.replace(TARGET_URL);
-        }
-
-        // Initialize and register your background Service Worker cache tracking
+        // Register the service worker quietly in the background without affecting the launch path
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Registration Error:', err));
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
             });
         }
     </script>
