@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GitBook Studio Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1a1a1a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        iframe { border: none; width: 100%; height: 100%; display: none; }
+        
+        /* Premium minimalist loading screen layout */
+        #splash { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; color: #ffffff; text-align: center; }
+        .logo { width: 64px; height: 64px; margin-bottom: 24px; opacity: 0.9; }
+        .status-text { font-size: 18px; font-weight: 500; margin-bottom: 8px; color: #fff; }
+        .timer-text { font-size: 14px; color: #888; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+    <!-- This minimalist splash display holds the screen while the auto-launch counts down -->
+    <div id="splash">
+        <img class="logo" src="https://gitbook.com" alt="GitBook">
+        <div id="main-status" class="status-text">Initializing GitBook Workspace...</div>
+        <div id="countdown-status" class="timer-text">Detecting environment...</div>
+    </div>
+
+    <!-- Isolated frame container that locks down your Smart Magic Keyboard Folio arrow paths -->
+    <iframe id="gitbook-frame" src="https://gitbook.com"></iframe>
+
+    <script>
+        const splashScreen = document.getElementById('splash');
+        const mainStatus = document.getElementById('main-status');
+        const countdownStatus = document.getElementById('countdown-status');
+        const gitbookFrame = document.getElementById('gitbook-frame');
+
+        // Check if the page is running as a saved Home Screen PWA icon
+        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: minimal-ui)').matches;
+
+        if (isStandalone) {
+            // WORKFLOW A: Launched via Home Screen PWA Icon -> Run hands-free auto-launch
+            let secondsLeft = 3;
+            mainStatus.textContent = "Launching Workspace Automatically";
+            countdownStatus.textContent = `Opening in ${secondsLeft} seconds...`;
+
+            const countdownInterval = setInterval(() => {
+                secondsLeft--;
+                if (secondsLeft > 0) {
+                    countdownStatus.textContent = `Opening in ${secondsLeft} seconds...`;
+                } else {
+                    clearInterval(countdownInterval);
+                    // Hide loading splash and immediately reveal the stable GitBook environment
+                    splashScreen.style.display = 'none';
+                    gitbookFrame.style.display = 'block';
+                }
+            }, 1000);
+
+        } else {
+            // WORKFLOW B: Opened inside standard Safari browser -> Freeze time so you can save it
+            mainStatus.textContent = "PWA Ready For Deployment";
+            countdownStatus.textContent = "Tap the Safari Share button → 'Add to Home Screen' now.";
+        }
+    </script>
+</body>
+</html>
