@@ -3,8 +3,8 @@
   "short_name": "GitBook",
   "start_url": "index.html",
   "display": "minimal-ui",
-  "background_color": "#1a1a1a",
-  "theme_color": "#1a1a1a",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "https://gitbook.com",
