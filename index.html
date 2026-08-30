@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GitBook Space Studio</title>
+    <title>GitBook Workspace Pro</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #ffffff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        iframe { border: none; width: 100%; height: 100%; display: none; }
         
-        /* Layout placeholder shown ONLY when opening via normal Safari link */
+        /* Premium deployment prompt shown ONLY inside standard Safari setup view */
         #safari-prompt { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; color: #24292e; text-align: center; background: #ffffff; }
         .logo { width: 64px; height: 64px; margin-bottom: 16px; }
         .status-text { font-size: 18px; font-weight: 600; color: #24292e; margin-bottom: 4px; }
@@ -18,33 +17,31 @@
 </head>
 <body>
 
-    <!-- Static browser screen visible only during initial configuration layout in Safari -->
+    <!-- This layout is strictly for initial onboarding inside native Safari -->
     <div id="safari-prompt">
         <img class="logo" src="https://gitbook.com" alt="GitBook">
         <div class="status-text">PWA Transporter Connected</div>
-        <div class="instruction-text">Tap Safari's Share icon → "Add to Home Screen" to deploy.</div>
+        <div class="instruction-text">Tap Safari's Share icon &rarr; "Add to Home Screen" to install.</div>
     </div>
 
-    <!-- The workspace container targeting your explicit dashboard organization subpage -->
-    <iframe id="gitbook-frame" src="https://app.gitbook.com/o/R7LSB5e7G7xlH369oTpt/home" allow="clipboard-read; clipboard-write"></iframe>
-
     <script>
-        const safariPrompt = document.getElementById('safari-prompt');
-        const gitbookFrame = document.getElementById('gitbook-frame');
+        const TARGET_URL = "https://gitbook.com";
 
-        // Check if container frame is currently initializing inside native PWA windows
-        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: minimal-ui)').matches;
+        // Identify if the framework is operating as a configured standalone Home Screen app instance
+        const isStandalone = window.navigator.standalone === true || 
+                             window.matchMedia('(display-mode: standalone)').matches || 
+                             window.matchMedia('(display-mode: minimal-ui)').matches;
 
         if (isStandalone) {
-            // INSTANT OPEN MODE: Completely drops the prompt and renders the specific space instantly
-            safariPrompt.style.display = 'none';
-            gitbookFrame.style.display = 'block';
+            // NATIVE CONTEXT TAKE-OVER: Instantly replace the browser path history node with your space dashboard.
+            // Using .replace() strips the white deployment shell out of the iPad history stack entirely.
+            window.location.replace(TARGET_URL);
         }
 
-        // Register the background Service Worker engine to lock the layout bounds
+        // Initialize and register your background Service Worker cache tracking
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration error:', err));
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Registration Error:', err));
             });
         }
     </script>
