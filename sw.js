@@ -1,53 +1,46 @@
-const CACHE_NAME = 'gitbook-space-v1';
+// Force cache-busting by utilizing a distinct version marker
+const CACHE_NAME = 'gitbook-workspace-v3';
+
+// Specify the exact local file dependencies of your launcher shell
 const ASSETS_TO_CACHE = [
-  './',
   'index.html',
   'manifest.json',
-  'icons/icon-192.svg',
-  'icons/icon-512.svg'
+  'sw.js'
 ];
 
-// Install: cache shell assets
-self.addEventListener('install', event => {
-  self.skipWaiting();
+// Install Event - Stores the local files securely into your iPad's storage layer
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Caching launcher framework assets...');
+      return cache.addAll(ASSETS_TO_CACHE);
+    }).then(() => self.skipWaiting()) // Forces the new worker to take charge immediately
   );
 });
 
-// Activate: clean up old caches
-self.addEventListener('activate', event => {
+// Activate Event - Sweeps away old, glitched versions of your custom PWA shell
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(key => (key === CACHE_NAME ? null : caches.delete(key)))
-    )).then(() => self.clients.claim())
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Clearing deprecated app caches...');
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim()) // Instantly claim control over the PWA window context
   );
 });
 
-// Fetch: 1) navigation requests -> network fallback to cache(index.html)
-//        2) other requests -> cache-first then network (and cache successful same-origin responses)
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-
-  // SPA navigation fallback
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).then(resp => resp).catch(() => caches.match('index.html'))
-    );
-    return;
-  }
-
+// Fetch Event - Intercepts requests locally but allows live network data to stream
+self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(networkResp => {
-        // Cache same-origin successful responses for future use
-        if (networkResp && networkResp.status === 200 && networkResp.type !== 'opaque') {
-          const clone = networkResp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return networkResp;
-      }).catch(() => caches.match('index.html'));
+    caches.match(event.request).then((cachedResponse) => {
+      // Serve local index/manifest files from cache for instant loading, 
+      // but let GitBook's server handle everything else cleanly via the network.
+      return cachedResponse || fetch(event.request);
     })
   );
 });
