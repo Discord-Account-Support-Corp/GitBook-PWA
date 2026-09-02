@@ -24,23 +24,44 @@
   </div>
 
   <script>
-    const target = 'https://app.gitbook.com/o/R7LSB5e7G7xlH369oTpt/home';
+    const target = 'https://gitbook.com';
 
-    // Verify if the active wrapper is running inside standalone Home Screen layout metrics
     const isStandalone = window.navigator.standalone === true || 
                          window.matchMedia('(display-mode: standalone)').matches || 
                          window.matchMedia('(display-mode: minimal-ui)').matches;
 
     if (isStandalone) {
-      // HOME SCREEN MODE: Instantly shift labels and force a native viewport takeover
       document.getElementById('headline').textContent = "Opening GitBook…";
-      document.getElementById('subline').innerHTML = 'If you are not redirected, <a href="' + target + '">click here</a>.';
+      document.getElementById('subline').innerHTML = 'If you are not redirected automatically, <a href="' + target + '">click here</a>.';
       
-      // Force an absolute context window break using _self to bypass cross-domain sandboxing
+      // Inject Copilot's Native Hardware Debouncer directly into the launch window listener
+      const DEBOUNCE_MS = 300;
+      let lastSlashTime = 0;
+
+      window.addEventListener('keydown', function (e) {
+        if (e.key !== '/') return;
+
+        // Block duplicate listener signals from high-frequency Smart Connectors
+        if (e.isComposing || e.repeat) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          return;
+        }
+
+        const now = Date.now();
+        if (now - lastSlashTime < DEBOUNCE_MS) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          return;
+        }
+        lastSlashTime = now;
+      }, true); // Enforce capture phase override
+
+      // Execute instant window takeover context jump
       window.open(target, '_self');
     }
 
-    // Quietly initialize your background worker layer
+    // Register service worker files quietly
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
