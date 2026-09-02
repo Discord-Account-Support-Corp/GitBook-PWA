@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <style>
-    body,html{height:100%;margin:0;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    body,html{height:100%;margin:0;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background-color:#ffffff;}
     .message{max-width:90%;text-align:center}
     .logo{width:64px;height:64px;margin-bottom:16px}
   </style>
@@ -19,23 +19,32 @@
 <body>
   <div class="message">
     <img class="logo" src="icons/icon-192.svg" alt="GitBook">
-    <h1>Opening GitBook…</h1>
-    <p>If you are not redirected automatically, <a id="link" href="#">click here</a>.</p>
+    <h1 id="headline">PWA Transporter Connected</h1>
+    <p id="subline">Tap Safari's Share icon &rarr; "Add to Home Screen" to install.</p>
   </div>
 
   <script>
-    // Redirect target provided by repository owner
     const target = 'https://app.gitbook.com/o/R7LSB5e7G7xlH369oTpt/home';
-    // Update fallback link
-    document.getElementById('link').href = target;
 
-    // Try a fast client-side replacement so the installed PWA opens the real app
-    try {
-      // Use replace to avoid creating history entry for the shell
-      window.location.replace(target);
-    } catch (e) {
-      // As a fallback, set location
-      window.location.href = target;
+    // Verify if the active wrapper is running inside standalone Home Screen layout metrics
+    const isStandalone = window.navigator.standalone === true || 
+                         window.matchMedia('(display-mode: standalone)').matches || 
+                         window.matchMedia('(display-mode: minimal-ui)').matches;
+
+    if (isStandalone) {
+      // HOME SCREEN MODE: Instantly shift labels and force a native viewport takeover
+      document.getElementById('headline').textContent = "Opening GitBook…";
+      document.getElementById('subline').innerHTML = 'If you are not redirected, <a href="' + target + '">click here</a>.';
+      
+      // Force an absolute context window break using _self to bypass cross-domain sandboxing
+      window.open(target, '_self');
+    }
+
+    // Quietly initialize your background worker layer
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
+      });
     }
   </script>
 </body>
