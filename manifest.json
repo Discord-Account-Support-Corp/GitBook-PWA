@@ -1,8 +1,7 @@
 {
   "name": "GitBook Workspace Pro",
   "short_name": "GitBook",
-  "start_url": ".",
-  "scope": ".",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
