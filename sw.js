@@ -1,7 +1,7 @@
-// Force cache-busting by utilizing a distinct version marker
-const CACHE_NAME = 'gitbook-workspace-v3';
+// FORCED CACHE-BUST: Version 4 forces iPadOS to drop the old fast-redirect loop instantly
+const CACHE_NAME = 'gitbook-workspace-v4';
 
-// Specify the exact local file dependencies of your launcher shell
+// Local files required to register your custom Home Screen launcher app shell
 const ASSETS_TO_CACHE = [
   'index.html',
   'manifest.json',
@@ -12,13 +12,13 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching launcher framework assets...');
+      console.log('Caching updated V4 launcher assets...');
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting()) // Forces the new worker to take charge immediately
+    }).then(() => self.skipWaiting()) // Forces this new V4 code to take charge immediately
   );
 });
 
-// Activate Event - Sweeps away old, glitched versions of your custom PWA shell
+// Activate Event - Sweeps away the old, cached fast-redirect scripts
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -34,12 +34,11 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event - Intercepts requests locally but allows live network data to stream
+// Fetch Event - Routes dashboard requests securely to GitBook servers
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Serve local index/manifest files from cache for instant loading, 
-      // but let GitBook's server handle everything else cleanly via the network.
+      // Serve local V4 script files instantly, but let GitBook handle everything else live via network
       return cachedResponse || fetch(event.request);
     })
   );
