@@ -8,14 +8,10 @@
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="icons/icon-192.svg" sizes="192x192" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <style>
-    body,html{height:100%;margin:0;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background-color:#ffffff;}
+    body,html{height:100%;margin:0;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background-color:#ffffff;}
     .message{max-width:90%;text-align:center}
     .logo{width:64px;height:64px;margin-bottom:16px}
-    h1{font-size: 24px; color: #24292e; margin-bottom: 8px;}
-    p{font-size: 16px; color: #586069;}
   </style>
 </head>
 <body>
@@ -28,17 +24,17 @@
   <script>
     const target = 'https://gitbook.com';
 
-    // Verify if the active wrapper is running inside standalone Home Screen layout metrics
     const isStandalone = window.navigator.standalone === true || 
                          window.matchMedia('(display-mode: standalone)').matches || 
                          window.matchMedia('(display-mode: minimal-ui)').matches;
 
-    if (isStandalone) {
-      // HOME SCREEN MODE: Instantly shift labels and execute immediate direct redirect
+    // The Safety Lock: If we are in the standard Safari browser, kill ALL redirects completely
+    if (!isStandalone) {
+      console.log("Safe Mode: Stalled inside Safari Browser to allow installation.");
+    } else {
+      // ONLY redirect if explicitly running from the saved Home Screen Icon
       document.getElementById('headline').textContent = "Opening GitBook…";
-      document.getElementById('subline').innerHTML = 'If you are not redirected automatically, <a href="' + target + '">click here</a>.';
       
-      // Inject Copilot's Native Hardware Debouncer directly into the launch window listener
       const DEBOUNCE_MS = 300;
       let lastSlashTime = 0;
 
@@ -58,15 +54,10 @@
         lastSlashTime = now;
       }, true);
 
-      // Force an absolute context window break using _self to bypass cross-domain sandboxing
+      // Execute redirect inside the standalone app wrapper wrapper
       window.open(target, '_self');
-    } else {
-      // BROWSER SAFARI MODE: The code halts here completely! 
-      // It will never redirect, giving you infinite time to click the share buttons.
-      console.log("Stalled in Safari Browser mode. Waiting for user to Add to Home Screen.");
     }
 
-    // Initialize your background worker layer safely
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
