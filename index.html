@@ -14,6 +14,8 @@
     body,html{height:100%;margin:0;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background-color:#ffffff;}
     .message{max-width:90%;text-align:center}
     .logo{width:64px;height:64px;margin-bottom:16px}
+    h1{font-size: 24px; color: #24292e; margin-bottom: 8px;}
+    p{font-size: 16px; color: #586069;}
   </style>
 </head>
 <body>
@@ -26,11 +28,13 @@
   <script>
     const target = 'https://gitbook.com';
 
+    // Verify if the active wrapper is running inside standalone Home Screen layout metrics
     const isStandalone = window.navigator.standalone === true || 
                          window.matchMedia('(display-mode: standalone)').matches || 
                          window.matchMedia('(display-mode: minimal-ui)').matches;
 
     if (isStandalone) {
+      // HOME SCREEN MODE: Instantly shift labels and execute immediate direct redirect
       document.getElementById('headline').textContent = "Opening GitBook…";
       document.getElementById('subline').innerHTML = 'If you are not redirected automatically, <a href="' + target + '">click here</a>.';
       
@@ -40,14 +44,11 @@
 
       window.addEventListener('keydown', function (e) {
         if (e.key !== '/') return;
-
-        // Block duplicate listener signals from high-frequency Smart Connectors
         if (e.isComposing || e.repeat) {
           e.preventDefault();
           e.stopImmediatePropagation();
           return;
         }
-
         const now = Date.now();
         if (now - lastSlashTime < DEBOUNCE_MS) {
           e.preventDefault();
@@ -55,13 +56,17 @@
           return;
         }
         lastSlashTime = now;
-      }, true); // Enforce capture phase override
+      }, true);
 
-      // Execute instant window takeover context jump
+      // Force an absolute context window break using _self to bypass cross-domain sandboxing
       window.open(target, '_self');
+    } else {
+      // BROWSER SAFARI MODE: The code halts here completely! 
+      // It will never redirect, giving you infinite time to click the share buttons.
+      console.log("Stalled in Safari Browser mode. Waiting for user to Add to Home Screen.");
     }
 
-    // Register service worker files quietly
+    // Initialize your background worker layer safely
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
